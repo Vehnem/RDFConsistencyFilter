@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 import org.apache.jena.atlas.json.JSON;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -76,8 +77,7 @@ public class Controller {
     		return "{ \"sessionid\" : \"error\" }";	
     	}
     }
-    /* TODO return result_dataset
-     * 
+    /* 
      * Get RDF data 
      * 
 	 * N-Triples,RDF/XML,JSON-LD,RDF/JSON,TriG,NQuads,TriX,RDF Thrift
@@ -96,12 +96,12 @@ public class Controller {
     @RequestMapping(value="/dataset/{id}", method=RequestMethod.GET, produces={"text/text;charset=UTF-8"})
     public @ResponseBody String getResultRDF(@PathVariable String id,
     										@RequestParam(value="format", defaultValue="TURTLE") String format) {
-    	Model model;
-    	
+    	Model model = ModelFactory.createDefaultModel();
+		
     	switch (format) {
     		case "TURTLE":  
     	    	try( final ByteArrayOutputStream os = new ByteArrayOutputStream() ){
-    	    		model = new RDFView("./RDF_DATA/"+id).getNT("result_dataset.nt");
+    	    		model.read("./RDF_DATA/"+id+"/result_dataset.nt", "N-TRIPLES");
     	    		model.write(os, "TURTLE");
     	    		return os.toString();
     	    	} catch (IOException e) {
@@ -110,7 +110,7 @@ public class Controller {
     			}
     		case "N-TRIPLES":
     	    	try( final ByteArrayOutputStream os = new ByteArrayOutputStream() ){
-    	    		model = new RDFView("./RDF_DATA/"+id).getNT("result_dataset.nt");
+    	    		model.read("./RDF_DATA/"+id+"/result_dataset.nt", "N-TRIPLES");
     	    		model.write(os, "N-TRIPLES");
     	    		return os.toString();
     	    	} catch (IOException e) {
@@ -132,9 +132,8 @@ public class Controller {
     @RequestMapping(value="/analyze/{id}", method=RequestMethod.GET, produces={"application/json"})
     public @ResponseBody String analyzeRDF(@PathVariable(value="id")String id) {
     	
-    	
     	String response = "{ ";
-    	RDFAnalyze ra = new RDFAnalyze("./RDF_DATA/"+id);
+    	RDFAnalyze ra = new RDFAnalyze(ModelFactory.createDefaultModel().read("./RDF_DATA/"+id+"/result_dataset.nt", "N-TRIPLES"));
     	ArrayList<String> properties = ra.possibleProperties();
     	
     	for(int i = 0; i < properties.size(); i++) {
@@ -202,47 +201,5 @@ public class Controller {
     @RequestMapping(value="/deldataset", method=RequestMethod.DELETE )
     public void deleteDataset(@RequestParam(value="id") String id) {
     	
-    }*/
-    
-    
-/**TEST**************************************************************************************************************
-    
-    @RequestMapping(value="/test", method=RequestMethod.GET, produces={"application/json"})
-    public @ResponseBody String testrest(@RequestParam(value="param1", defaultValue="param1")String param1,
-    									 @RequestParam(value="param2", defaultValue="param2")String param2,
-    									 HttpServletResponse  response) {
-    	
-    	
-    	
-    	return "{\"name\":\"unknown\", \"age\":-1 , \"field\" : {\"1\" : \"a\" , \"2\" : \"b\"}}";
-    	
-    }
-
-    @RequestMapping(value="/{time}", method = RequestMethod.GET)
-    public @ResponseBody MyData getMyData(
-            @PathVariable long time) {
-
-        return new MyData(time, "REST GET Call !!!");
-    }
-
-    @RequestMapping(method = RequestMethod.PUT)
-    public @ResponseBody MyData putMyData(
-            @RequestBody MyData md) {
-
-        return md;
-    }
-
-    @RequestMapping(method = RequestMethod.POST)
-    public @ResponseBody MyData postMyData() {
-
-    	return new MyData(System.currentTimeMillis(),
-            "REST POST Call !!!");
-    }
-
-    @RequestMapping(value="/{time}", method = RequestMethod.DELETE)
-    public @ResponseBody MyData deleteMyData(
-            @PathVariable long time) {
-
-        return new MyData(time, "REST DELETE Call !!!");
     }*/
 }

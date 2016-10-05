@@ -168,3 +168,47 @@ TODO
 		return this.uniqueQuery;
 	}*/
 }	
+
+####
+
+    
+/**TEST**************************************************************************************************************
+    
+    @RequestMapping(value="/test", method=RequestMethod.GET, produces={"application/json"})
+    public @ResponseBody String testrest(@RequestParam(value="param1", defaultValue="param1")String param1,
+    									 @RequestParam(value="param2", defaultValue="param2")String param2,
+    									 HttpServletResponse  response) {
+    	
+    	
+    	
+    	return "{\"name\":\"unknown\", \"age\":-1 , \"field\" : {\"1\" : \"a\" , \"2\" : \"b\"}}";
+    	
+    }
+
+    @RequestMapping(value="/{time}", method = RequestMethod.GET)
+    public @ResponseBody MyData getMyData(
+            @PathVariable long time) {
+
+        return new MyData(time, "REST GET Call !!!");
+    }
+
+    @RequestMapping(method = RequestMethod.PUT)
+    public @ResponseBody MyData putMyData(
+            @RequestBody MyData md) {
+
+        return md;
+    }
+
+    @RequestMapping(method = RequestMethod.POST)
+    public @ResponseBody MyData postMyData() {
+
+    	return new MyData(System.currentTimeMillis(),
+            "REST POST Call !!!");
+    }
+
+    @RequestMapping(value="/{time}", method = RequestMethod.DELETE)
+    public @ResponseBody MyData deleteMyData(
+            @PathVariable long time) {
+
+        return new MyData(time, "REST DELETE Call !!!");
+    }*/

@@ -6,9 +6,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import wetd.RDFView;
+import wetd.RDFStore;
 
-public class RDFViewTest {
+public class RDFStoreTest {
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -28,9 +28,7 @@ public class RDFViewTest {
 
 	@Test
 	public void test() {
-		RDFView rv = new RDFView("./RDF_DATA/film_runtime_released_full");
-    	
-		rv.getNT("dataset.nt").write(System.out, "N-TRIPLES");
+		System.out.println("done");
 	}
 
 }

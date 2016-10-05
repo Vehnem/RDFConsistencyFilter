@@ -22,12 +22,12 @@ public class Scheduler {
 
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 
-    @Scheduled(fixedRate = 5000)
+    //@Scheduled(fixedRate = 5000)
     public void reportCurrentTime() {
-        //log.info("The time is now {}", dateFormat.format(new Date()));
+        log.info("The time is now {}", dateFormat.format(new Date()));
     }
     
-    @Scheduled(fixedRate = 15 * 60000)
+    //@Scheduled(fixedRate = 15 * 60000)
     public void deleteOldFiles() {
     	File rootdir = new File("./RDF_DATA/");
 				
@@ -42,7 +42,9 @@ public class Scheduler {
 			if(time_diff > 30) {
 				deleteFolder(m);
 				log.info("Deleted : "+subdir.toString());
-			}	
+			} else {
+				log.info(time_diff+" min remain for "+subdir.toString());
+			}
 		}
     }
     

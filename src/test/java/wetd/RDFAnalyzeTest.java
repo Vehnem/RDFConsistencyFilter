@@ -1,6 +1,7 @@
 package wetd;
 //import static org.junit.Assert.*;
 
+import org.apache.jena.rdf.model.ModelFactory;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -29,7 +30,9 @@ public class RDFAnalyzeTest {
 
 	@Test
 	public void test() {
-		RDFAnalyze ra = new RDFAnalyze("./RDF_EXAMPLES/film_runtime_100");
+		
+		
+		RDFAnalyze ra = new RDFAnalyze(ModelFactory.createDefaultModel().read("./RDF_EXAMPLES/film_runtime_100/dataset.nt", "N-TRIPLES"));
 		
 		String property = ra.possibleProperties().get(0); //runtime
 		

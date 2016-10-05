@@ -1,5 +1,4 @@
-$ mvn clean package
-$ java -jar target/***.jar
+# RDFConsistencyFilter
 
-Visit localhost:8080
+
 

@@ -22,9 +22,8 @@ public class RDFAnalyze {
 /*
  * Constructor loads the RDF data
  */
-	public RDFAnalyze(String location){
-		this.model = ModelFactory.createDefaultModel();
-		this.model.read(location+"/dataset.nt", "N-TRIPLES");
+	public RDFAnalyze(Model model){
+		this.model = model;
 	}
 	
 /*

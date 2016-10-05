@@ -30,4 +30,11 @@ public class OnRDFUnit {
 	    System.out.println(e);
 	}
 	}
+	
+	/* bin/rdfunit 
+	 * 
+	 * -d Path to File
+	 * -v no LOV
+	 * 
+	 */
 }

@@ -32,7 +32,7 @@ public class RDFAnalyzeTest {
 	public void test() {
 		
 		
-		RDFAnalyze ra = new RDFAnalyze(ModelFactory.createDefaultModel().read("./RDF_EXAMPLES/film_runtime_100/dataset.nt", "N-TRIPLES"));
+		RDFAnalyze ra = new RDFAnalyze(ModelFactory.createDefaultModel().read("./RDF_EXAMPLES/film_released_100/dataset.nt", "N-TRIPLES"));
 		
 		String property = ra.possibleProperties().get(0); //runtime
 		

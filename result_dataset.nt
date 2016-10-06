@@ -1,0 +1,29 @@
+<http://dbpedia.org/resource/Photocopy_(film)> <http://dbpedia.org/property/released> "Under Production"@en .
+<http://dbpedia.org/resource/Photocopy_(film)> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/ontology/Film> .
+<http://dbpedia.org/resource/GURU_-_Bhagwan,_His_Secretary_&_His_Bodyguard> <http://dbpedia.org/property/released> "April 2010"@en .
+<http://dbpedia.org/resource/GURU_-_Bhagwan,_His_Secretary_&_His_Bodyguard> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/ontology/Film> .
+<http://dbpedia.org/resource/It's_All_About_Dancing:_A_Jamaican_Dance-U-Mentary> <http://dbpedia.org/property/released> "--01-14"^^<http://www.w3.org/2001/XMLSchema#gMonthDay> .
+<http://dbpedia.org/resource/It's_All_About_Dancing:_A_Jamaican_Dance-U-Mentary> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/ontology/Film> .
+<http://dbpedia.org/resource/Packed_in_a_Trunk:_The_Lost_Art_of_Edith_Lake_Wilkinson> <http://dbpedia.org/property/released> "January 2015"@en .
+<http://dbpedia.org/resource/Packed_in_a_Trunk:_The_Lost_Art_of_Edith_Lake_Wilkinson> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/ontology/Film> .
+<http://dbpedia.org/resource/A_Canine_Sherlock_Holmes> <http://dbpedia.org/property/released> "December 1912"@en .
+<http://dbpedia.org/resource/A_Canine_Sherlock_Holmes> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/ontology/Film> .
+<http://dbpedia.org/resource/The_Nostalgist> <http://dbpedia.org/property/released> "Jun 19, 2014, Palm Springs International Shortfest"@en .
+<http://dbpedia.org/resource/The_Nostalgist> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/ontology/Film> .
+<http://dbpedia.org/resource/Rocket_(Kannada_film)> <http://dbpedia.org/property/released> "October 2015"@en .
+<http://dbpedia.org/resource/Rocket_(Kannada_film)> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/ontology/Film> .
+<http://dbpedia.org/resource/I_Am_Chris_Farley> <http://dbpedia.org/property/released> "--08-10"^^<http://www.w3.org/2001/XMLSchema#gMonthDay> .
+<http://dbpedia.org/resource/I_Am_Chris_Farley> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/ontology/Film> .
+<http://dbpedia.org/resource/Greeks_of_the_Sea> <http://dbpedia.org/property/released> "--07-21"^^<http://www.w3.org/2001/XMLSchema#gMonthDay> .
+<http://dbpedia.org/resource/Greeks_of_the_Sea> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/ontology/Film> .
+<http://dbpedia.org/resource/Hostel_Returns> <http://dbpedia.org/property/released> "--08-19"^^<http://www.w3.org/2001/XMLSchema#gMonthDay> .
+<http://dbpedia.org/resource/Hostel_Returns> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/ontology/Film> .
+<http://dbpedia.org/resource/Dällebach_Kari_-_The_Musical> <http://dbpedia.org/property/released> "Debut 2009"@en .
+<http://dbpedia.org/resource/Dällebach_Kari_-_The_Musical> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/ontology/Film> .
+<http://dbpedia.org/resource/Race_(film_series)> <http://dbpedia.org/property/released> "''"@en .
+<http://dbpedia.org/resource/Race_(film_series)> <http://dbpedia.org/property/released> "'':"@en .
+<http://dbpedia.org/resource/Race_(film_series)> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/ontology/Film> .
+<http://dbpedia.org/resource/A_Park_Lane_Scandal> <http://dbpedia.org/property/released> "August 1915"@en .
+<http://dbpedia.org/resource/A_Park_Lane_Scandal> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/ontology/Film> .
+<http://dbpedia.org/resource/BoBoiBoy:_The_Movie> <http://dbpedia.org/property/released> "or"@en .
+<http://dbpedia.org/resource/BoBoiBoy:_The_Movie> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/ontology/Film> .

@@ -14,7 +14,7 @@ var GetJson = function() {
 	query = document.getElementById("queryfield").value;
         $.ajax({
         type: 'POST',
-        url:  prefix + '/Rest/exec',
+        url:  prefix + '/Rest/execquery',
         data: {"query": query,
         	"limit" : limit,
         	"endpoint" : endpoint},

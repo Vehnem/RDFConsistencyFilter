@@ -47,7 +47,7 @@ public class RDFGetter {
  * @param queryString query
  * @param file_location location of the dataset
  */
-	public static void getRDF(String queryString, String rootLocation,String endpoint, long endpointLimit) {
+	public static void getRDF(final String queryString, final String rootLocation, final String endpoint, final long endpointLimit) {
 		
 		// Declare
 	

@@ -50,6 +50,8 @@ public class RDFAnalyze {
 		}
 		return properties;
 	}
+	
+	
 
 /*
  * Counts data types
@@ -79,6 +81,17 @@ public class RDFAnalyze {
 		    	}
 		    	else {
 		    		int list_pos = datatypes.indexOf(datatype);
+		    		
+		    		long tmp = (counter_datatypes.get(list_pos) + 1);
+		    		counter_datatypes.set(list_pos, tmp);
+		    	}
+		    } else if(predicate.toString().equals(property)) {
+		    	if(!datatypes.contains("Unknown Type")){
+		    		datatypes.add("Unknown Type");
+		    		counter_datatypes.add((long) 1);
+		    	}
+		    	else {
+		    		int list_pos = datatypes.indexOf("Unknown Type");
 		    		counter_datatypes.set(list_pos, counter_datatypes.get(list_pos)+1);
 		    	}
 		    }

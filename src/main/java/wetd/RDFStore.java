@@ -15,4 +15,8 @@ public class RDFStore {
 	
 	private HashMap<String, Date> timer;
 	
+	public String getExisting() {
+		return "";
+	}
+	
 }

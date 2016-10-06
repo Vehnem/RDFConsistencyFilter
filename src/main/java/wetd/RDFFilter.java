@@ -3,6 +3,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -16,8 +18,8 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 
-/*
- * TODO Filter all 
+
+/* 
  * Filter for more consistency in the RDFFile
  */
 public class RDFFilter {
@@ -44,7 +46,7 @@ public class RDFFilter {
  * @param property
  * @param datatype
  */
-	public void useFilter_p_o(String property, String datatype) {
+	public void old_useFilter_p_o(String property, String datatype) {
 
 		Model model = ModelFactory.createDefaultModel();
 		model.read(dataModel+"/dataset.nt", "N-TRIPLES");
@@ -60,7 +62,6 @@ public class RDFFilter {
 		    
 		    if(!predicate.toString().equals(property)) {
 		    	filter_model.add(stmt);
-		    //TODO hasLiteral is important
 		    } else if (predicate.toString().equals(property) && object.asLiteral().getDatatypeURI().toString().equals(datatype)) {
 		    	filter_model.add(stmt);
 		    }
@@ -119,13 +120,13 @@ public class RDFFilter {
 		catch(IOException e) {System.out.println("ERROR at storing RDF");}
 	}
 	
-	/* TODO Test by saving all duplicates in a independent file
+	/*
 	 * remove duplicated values for one property (take the first)
 	 * 
 	 * @param property 
 	 * @param filename
 	 */
-	public void remove_dublicates(String property, String filename) {
+	public void old_remove_dublicates(String property, String filename) {
 		Model model = ModelFactory.createDefaultModel();
 		model.read(dataKeyLocation+"/"+filename, "N-TRIPLES");
 		Model new_model = ModelFactory.createDefaultModel();
@@ -174,15 +175,24 @@ public class RDFFilter {
 		new_model.close();
 	}
 	
-	public void new_filter(String dataKeyLocation, String property, String datatype) {
+	/**
+	 * Filter for property and datatype
+	 * 
+	 * @param dataKeyLocation
+	 * @param property
+	 * @param datatype
+	 * @param remove_duplicates
+	 * @param consistent
+	 * 
+	 */
+	public void new_filter(String dataKeyLocation, String property, List<String> datatypes, boolean remove_duplicates, boolean consistent) {
+		
 		Model new_model = ModelFactory.createDefaultModel();
-		
 		StmtIterator iter = dataModel.listStatements();
-		
 		String temp_subject = "";
-		
-		boolean changed = false;
-		
+		boolean contains_property = false;
+		List<Statement> stmtlist = new ArrayList<Statement>();
+				
 		while(iter.hasNext()) {
 		
 			Statement stmt      = iter.nextStatement(); 
@@ -192,47 +202,71 @@ public class RDFFilter {
 		    
 		    if(!temp_subject.equals(subject.toString())) {
 		    	temp_subject = subject.toString();
-		    	changed = true;
+		    	if(contains_property) {
+		    		new_model.add(stmtlist);
+		    		contains_property = false;
+		    	} else if(!consistent) {
+		    		new_model.add(stmtlist);
+		    	}
+		    	stmtlist = new ArrayList<Statement>();
 		    }
 		    
-		    //TODO naiv
+		    /*
+		     * 0 0 | 1 # 0 0 | 1
+		     * 0 1 | 1 # 0 1 | 0
+		     * 1 0 | 1 # 1 0 | 1
+		     * 1 1 | 0 # 1 1 | 1
+		 	 *
+		     * -(a und b)   # (a oder -b)
+		     * (-a oder -b  # 
+		     */
+		    
 		    if(predicate.toString().equals(property)) {
-		    	if(object.isLiteral()) {
-		    		if(object.asLiteral().toString().equals(datatype));
-		    			new_model.add(stmt);
-		    	} else {
-		    		if(object.toString().equals(datatype)) {
-		    			new_model.add(stmt);
+		    	
+		    	if(!contains_property || !remove_duplicates) {
+		    		
+		    		if(object.isLiteral() && datatypes.contains(object.asLiteral().getDatatypeURI().toString())) {
+		    			stmtlist.add(stmt);
+		    			contains_property = true;
+		    		} else if(datatypes.contains(object.toString())) {
+		    			stmtlist.add(stmt);
+		    			contains_property = true;
 		    		}
 		    	}
 		    } else {
-		    	new_model.add(stmt);
+		    	stmtlist.add(stmt);
 		    }
 		    
-		    
-		    /*
-			//save new RDFmodel 
-			FileOutputStream fileStream;
-			OutputStreamWriter outputWriter;
-				
-			try {
-				fileStream = new FileOutputStream(new File(data+"/result_dataset.nt"));
-				outputWriter = new OutputStreamWriter(fileStream, "UTF-8");
-					
-				new_model.write(outputWriter, "N-TRIPLES");
-				outputWriter.close();
-				fileStream.close();
-				
-			}
-			catch(IOException e) {System.out.println("ERROR at storing RDF");}*/
-		    
-			iter.next();
+		    //naiv for last Resource
+		    if(!iter.hasNext()) {
+		    	if(contains_property) {
+		    		new_model.add(stmtlist);
+		    		contains_property = false;
+		    	} else if(!consistent) {
+		    		new_model.add(stmtlist);
+		    	}
+		    }
 		}
 		
-		dataModel.removeAll();
+		//save new RDFmodel 
+		FileOutputStream fileStream;
+		OutputStreamWriter outputWriter;
+			
+		try {
+			fileStream = new FileOutputStream(new File(dataKeyLocation+"result_dataset.nt"));
+			outputWriter = new OutputStreamWriter(fileStream, "UTF-8");
+				
+			new_model.write(outputWriter, "N-TRIPLES");
+			outputWriter.close();
+			fileStream.close();
+			
+		}
+		catch(IOException e) {e.printStackTrace();}
+		
+		/*dataModel.removeAll();
 		
 		
-		dataModel.add(new_model);
+		dataModel.add(new_model);*/
 		new_model.close();
 	}
 	

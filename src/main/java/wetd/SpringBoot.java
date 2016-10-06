@@ -4,8 +4,6 @@ import static springfox.documentation.builders.PathSelectors.regex;
 
 //http://localhost:8080/
 
-//TODO make a log file which contains all parameters that data edited
-
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -40,6 +38,7 @@ public class SpringBoot {
 				.paths(regex("/Rest.*")).build();
 	}
 
+	//@Override
 	private ApiInfo apiInfo() {
 		return new ApiInfoBuilder().title("Api Information").
 				description("Api Information with SWAGGER")

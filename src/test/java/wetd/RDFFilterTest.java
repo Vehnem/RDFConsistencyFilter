@@ -1,6 +1,9 @@
 package wetd;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 
@@ -34,29 +37,22 @@ public class RDFFilterTest {
 	public void test() {
 		Model model = ModelFactory.createDefaultModel();
 		
-		model.read("./RDF_EXAMPLES/film_runtime_100/dataset.nt", "N-TRIPLES");
+		model.read("./RDF_EXAMPLES/film_released_100/dataset.nt", "N-TRIPLES");
 		System.out.println("1");
 		RDFFilter rf = new RDFFilter(model);
-		System.out.println("1");
-		rf.new_filter("", "http://dbpedia.org/property/runtime", "http://dbpedia.org/datatype/minute");
-		System.out.println("1");
-		rf.getModel().write(System.out, "N-TRIPLES");
-		System.out.println("1");
+		System.out.println("2");
+		
+		List<String> list = new ArrayList<String>();
+		
+		list.add("http://www.w3.org/2001/XMLSchema#gMonthDay");
+		list.add("http://www.w3.org/1999/02/22-rdf-syntax-ns#langString");
+		
+		rf.new_filter("", "http://dbpedia.org/property/released", list, false, true);
+		System.out.println("3");
+		
 		/*
-		 * for property http://dbpedia.org/property/runtime
-
-			93	http://dbpedia.org/datatype/second
-		 */
-		
-		
-		//rf.useFilter_p_o("http://dbpedia.org/property/gross", "http://dbpedia.org/datatype/usDollar");
-		
-		
-		//rf.new_filter("","","");
-		/* Crash new functions
-		 * 
-		 * System.out.println("done");
-		
+		rf.useFilter_p_o("http://dbpedia.org/property/gross", "http://dbpedia.org/datatype/usDollar");
+				
 		rf.remove_without_p("prefix dbo: <http://dbpedia.org/ontology/>"+
 				  "prefix dbp: <http://dbpedia.org/property/>"+
 				  "construct {?film a dbo:Film. ?film dbp:runtime ?runtime.} "+				
@@ -65,7 +61,8 @@ public class RDFFilterTest {
 		
 		rf.remove_dublicates("http://dbpedia.org/property/runtime", "new_dataset.nt");
 		
-		System.out.println("done");*/
+		System.out.println("done");
+		*/
 	}
 
 }

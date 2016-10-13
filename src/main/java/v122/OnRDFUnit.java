@@ -59,7 +59,7 @@ public class OnRDFUnit {
 	public void foo() {
 		try {                 
 			String result = "";
-		    String[] cmd = { "/bin/sh", "-c", "cd ./RDFUnit-0.8; bin/rdfunit -h" };
+		    String[] cmd = { "/bin/sh", "-c", "cd ../RDFUnit-0.8; bin/rdfunit -h" };
 		    Process p = Runtime.getRuntime().exec(cmd);
 
 		    BufferedReader in =

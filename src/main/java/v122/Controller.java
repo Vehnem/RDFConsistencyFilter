@@ -2,13 +2,17 @@ package v122;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -40,11 +44,15 @@ public class Controller {
 //										   "prefix dbp: <http://dbpedia.org/property/>"+
 //										   "select * where { ?film a dbo:Film. ?film dbp:runtime ?runtime.} Limit 100"; 
 	
-	private final String defaultConQuery = "prefix dbo: <Chttp://dbpedia.org/ontology/> "+
-			  							   "prefix dbp: <Chttp://dbpedia.org/property/> "+
+	private static final Logger log = LoggerFactory.getLogger(Scheduler.class);
+	
+	private final String defaultConQuery = "prefix dbo: <http://dbpedia.org/ontology/> "+
+			  							   "prefix dbp: <http://dbpedia.org/property/> "+
 			  							   "construct {?film a dbo:Film. ?film dbp:runtime ?runtime.} "+				
 			  							   "where {?film a dbo:Film. ?film dbp:runtime ?runtime.} Limit 100";
     
+	private final String encodedConQuery = "prefix%20dbo%3A%20%3Chttp%3A%2F%2Fdbpedia.org%2Fontology%2F%3E%20prefix%20dbp%3A%20%3Chttp%3A%2F%2Fdbpedia.org%2Fproperty%2F%3E%20construct%20%7B%3Ffilm%20a%20dbo%3AFilm.%20%3Ffilm%20dbp%3Aruntime%20%3Fruntime.%7D%20where%20%7B%3Ffilm%20a%20dbo%3AFilm.%20%3Ffilm%20dbp%3Aruntime%20%3Fruntime.%7D%20Limit%20100";
+	
     /**
      * Get RDF from a Sparql-endpoint over a CONSTRUCT Query
      * and save the result at the file-system
@@ -54,22 +62,23 @@ public class Controller {
      * @param query
      * @return
      */
-    @ApiOperation(value = "load", nickname="loadRDF")
+    @ApiOperation(value = "query", nickname="queryRDF")
     @ApiImplicitParams({
     	@ApiImplicitParam(name = "endpoint", value = "SPARQL Endpoint", required = true, dataType = "string", paramType = "query", defaultValue="http://dbpedia.org/sparql"),
     	@ApiImplicitParam(name = "limit", value = "Endpoint return limit", required = true, dataType = "string", paramType = "query", defaultValue="10000"),
     	@ApiImplicitParam(name = "query", value = "Construct Query", required = true, dataType = "string", paramType = "query", defaultValue=defaultConQuery)
     })
-    @RequestMapping(value="/load", method=RequestMethod.POST)
-    public @ResponseBody String loadRDF_query(@RequestParam(value="endpoint",required=true, defaultValue="")String endpoint,
+    @RequestMapping(value="/query", method=RequestMethod.POST)
+    public @ResponseBody String queryRDF(@RequestParam(value="endpoint",required=true, defaultValue="")String endpoint,
     										 @RequestParam(value="limit",required=true, defaultValue="")long limit,
     										 @RequestParam(value="query",required=true, defaultValue="")String query) {
     	try{
     		RDFGetter rg = new RDFGetter(endpoint, limit, query);
-    		return "{ \"sessiondatakey\" : \""+rg.getDataKey()+"\" }";
+    		log.info("loaded");
+    		return "{ \"datakey\" : \""+rg.getDataKey()+"\" }";
     	}
     	catch(Exception e) {
-    		return "{ \"sessiondatakey\" : \"error\" }";	
+    		return "{ \"datakey\" : \"\" }";
     	}
     }
     
@@ -97,11 +106,12 @@ public class Controller {
         @ApiImplicitParam(name = "format", value = "Format", required = false, dataType = "string", paramType = "query", defaultValue="TURTLE")
       })
     @ApiResponses(value = { 
-            @ApiResponse(code = 200, message = "Success"),
-            @ApiResponse(code = 401, message = "Unauthorized"),
-            @ApiResponse(code = 403, message = "Forbdatakeyden"),
-            @ApiResponse(code = 404, message = "Not Found"),
-            @ApiResponse(code = 500, message = "Failure")}) 
+//            @ApiResponse(code = 200, message = "Success"),
+//            @ApiResponse(code = 401, message = "Unauthorized"),
+//            @ApiResponse(code = 403, message = "Forbdatakeyden"),
+//            @ApiResponse(code = 404, message = "Not Found"),
+//            @ApiResponse(code = 500, message = "Failure")
+            }) 
     @RequestMapping(value="/show/{datakey}", method=RequestMethod.GET, produces={"text/text;charset=UTF-8"})
     public @ResponseBody String showRDF(@PathVariable String datakey,
     									@RequestParam(value="format", defaultValue="TURTLE") String format) {
@@ -110,7 +120,7 @@ public class Controller {
     	switch (format) {
     		case "TURTLE":  
     	    	try( final ByteArrayOutputStream os = new ByteArrayOutputStream() ){
-    	    		model.read("./RDF_DATA/"+datakey+"/result_dataset.nt", "N-TRIPLES");
+    	    		model.read("./RDF_DATA/"+datakey+"/result.nt", "N-TRIPLES");
     	    		model.write(os, "TURTLE");
     	    		return os.toString();
     	    	} catch (IOException e) {
@@ -119,7 +129,7 @@ public class Controller {
     			}
     		case "N-TRIPLES":
     	    	try( final ByteArrayOutputStream os = new ByteArrayOutputStream() ){
-    	    		model.read("./RDF_DATA/"+datakey+"/result_dataset.nt", "N-TRIPLES");
+    	    		model.read("./RDF_DATA/"+datakey+"/result.nt", "N-TRIPLES");
     	    		model.write(os, "N-TRIPLES");
     	    		return os.toString();
     	    	} catch (IOException e) {
@@ -142,10 +152,10 @@ public class Controller {
         @ApiImplicitParam(name = "datakey", value = "Key", required = true, dataType = "string", paramType = "path", defaultValue="film_runtime_100"),
       })
     @RequestMapping(value="/analyze/{datakey}", method=RequestMethod.GET, produces={"application/json"})
-    public @ResponseBody String analyzeRDF(@PathVariable(value="datakey")String datakey) {
+	public @ResponseBody String analyzeRDF(@PathVariable(value="datakey")String datakey) {
     	
     	String response = "{ ";
-    	RDFAnalyze ra = new RDFAnalyze(ModelFactory.createDefaultModel().read("./RDF_DATA/"+datakey+"/result_dataset.nt", "N-TRIPLES"));
+    	RDFAnalyze ra = new RDFAnalyze(ModelFactory.createDefaultModel().read("./RDF_DATA/"+datakey+"/dataset.nt", "N-TRIPLES"));
     	ArrayList<String> properties = ra.possibleProperties();
     	
     	for ( int i = 0 ; i < properties.size(); i++ ) {
@@ -191,32 +201,56 @@ public class Controller {
      */
     @ApiOperation(value = "filter", nickname = "filterRDF")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "datakey", value = "Key", required = true, dataType = "string", paramType = "path", defaultValue="film_runtime_100"),
-        @ApiImplicitParam(name = "property", value = "Key", required = true, dataType = "string", paramType = "query", defaultValue="http://dbpedia.org/property/runtime"),
-        @ApiImplicitParam(name = "datatype", value = "Key", required = true, dataType = "string", paramType = "query", defaultValue="http://www.w3.org/2001/XMLSchema#integer"),
-        @ApiImplicitParam(name = "query", value = "Key", required = true, dataType = "string", paramType = "query", defaultValue=defaultConQuery),
-        @ApiImplicitParam(name = "dublicate_filter", value = "Key", required = true, dataType = "string", paramType = "query", defaultValue="1"),
-      })
-    @RequestMapping(value="/filter/", method=RequestMethod.POST , produces={"application/json"})
-    public @ResponseBody String filterRDF(@RequestParam( value = "datakey", defaultValue="film_runtime_100")String datakey, 
+        @ApiImplicitParam(name = "datakey", value ="", required = true, dataType = "string", paramType = "path", defaultValue="film_runtime_100"),
+        @ApiImplicitParam(name = "property",  value ="", required = true, dataType = "string", paramType = "query", defaultValue="http://dbpedia.org/property/runtime"),
+        @ApiImplicitParam(name = "datatypes",  value ="", required = true, dataType = "string", paramType = "query", defaultValue="http://www.w3.org/2001/XMLSchema#integer"),
+        @ApiImplicitParam(name = "remove_duplicates",value ="", required = false, dataType = "boolean", paramType = "query", defaultValue="true"),
+        @ApiImplicitParam(name = "consistent", value ="", required = false, dataType = "boolean", paramType = "query", defaultValue="true"),
+        @ApiImplicitParam(name = "rdfunit_params", value ="", required = false, dataType = "string", paramType = "query", defaultValue="skip")
+        
+    })
+    @RequestMapping(value="/filter/{datakey}", method=RequestMethod.POST , produces={"application/json"})
+    public @ResponseBody String filterRDF(@PathVariable String datakey, 
     										  @RequestParam( value = "property", defaultValue="http://dbpedia.org/property/runtime")String property,
     										  @RequestParam( value = "datatypes", defaultValue="http://www.w3.org/2001/XMLSchema#integer")String datatypes,      	
-    										  @RequestParam( value = "remove_duplicates", defaultValue="0")boolean remove_duplicates,
-    										  @RequestParam( value = "consistent", defaultValue="true")boolean consistent) {
-       	
-    	RDFFilter rf = new RDFFilter(ModelFactory.createDefaultModel().read("./RDF_DATA/"+datakey+"/result_dataset.nt", "N-TRIPLES"));
+    										  @RequestParam( value = "remove_duplicates", defaultValue="true")boolean remove_duplicates,
+    										  @RequestParam( value = "consistent", defaultValue="true")boolean consistent,
+    										  @RequestParam( value = "rdfunit_params", defaultValue="")String rdfunit_params ) {
+       			
+    	RDFFilter rf = new RDFFilter(ModelFactory.createDefaultModel().read("./RDF_DATA/"+datakey+"/dataset.nt", "N-TRIPLES"));
     	
     	
     	List<String> datatypelist = Arrays.asList(datatypes.split("\\s*,\\s*"));
-    	Model model = rf.new_filter( property , datatypelist , remove_duplicates , consistent);
     	
-    	try( final ByteArrayOutputStream os = new ByteArrayOutputStream() ){
-    		model.write(os, "N-TRIPLES");
-    		return os.toString();
-    	} catch (IOException e) {
-			e.printStackTrace();
-			return null;
+    	try {
+    		String rdfunit_msg ="skipped";
+        	Model model = rf.new_filter( property , datatypelist , remove_duplicates , consistent);
+        	
+    		FileOutputStream fileStream = new FileOutputStream(new File("./RDF_DATA/"+datakey+"/result.nt"));
+    		OutputStreamWriter outputWriter = new OutputStreamWriter(fileStream, "UTF-8");
+    		
+    		model.write(outputWriter, "N-TRIPLES");
+    		model.close();
+    		
+    		//RDFUnit TODO
+    		if( false == rdfunit_params.equals("skip")) {
+    			OnRDFUnit rdfu = new OnRDFUnit();
+    			String params = "-d ../RDFConsistencyFilter/RDF_DATA/"+datakey+"/result.nt";
+    			rdfunit_msg = rdfu.runRDFUnit_cmdline(params);
+    		}
+        	return "{ \"message\" : \"filtered\" , \"rdfunit\" : \""+rdfunit_msg +"\"}";
+    	} catch (Exception e) {
+    		return "{ \"message\" : \"failed\" }";
     	}
+
+    	
+//    	try( final ByteArrayOutputStream os = new ByteArrayOutputStream() ){
+//    		model.write(os, "N-TRIPLES");
+//    		return os.toString();
+//    	} catch (IOException e) {
+//			e.printStackTrace();
+//			return null;
+//    	}
     }
     
     /**
@@ -229,8 +263,18 @@ public class Controller {
     	@ApiImplicitParam(name = "datakey", value = "Key", required = true, dataType = "string", paramType = "path", defaultValue=""),
     })
     @RequestMapping(value="/delete/{datakey}", method=RequestMethod.DELETE )
-    public void deleteDataset(@PathVariable(value="datakey") String datakey) {
+    public String deleteDataset(@PathVariable(value="datakey") String datakey) {
     	File folder = new File("./RDF_DATA/"+datakey);
-    	new RDFStore().deleteFolder(folder);    	
+    	
+    	try
+    	{
+    		new RDFStore().deleteFolder(folder);   
+        	return "{ \"message\" : \"deleted\" }";
+    	} 
+    	catch(Exception e) 
+    	{
+    		return "{ \"message\" : \"failed\" }";
+    	}
+    	
     }
 }

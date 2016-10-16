@@ -38,7 +38,7 @@ public class Scheduler {
 				deleteFolder(m);
 				log.info("Deleted : "+subdir.toString());
 			} else {
-				log.info(time_diff+" min remain for "+subdir.toString());
+				log.info((30 -time_diff)+" min remain for "+subdir.toString());
 			}
 		}
     }

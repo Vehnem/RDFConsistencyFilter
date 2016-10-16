@@ -1,111 +1,162 @@
+var prefix = window.location.href;
+var datakey = "";
+var stats = "";
 
-
-var prefix = "http://localhost:8080";
-var query = "";
-var sessionid = "film_runtime_100";
-
-var ShowVar = function() {
-  document.getElementById("demo").innerHTML = dataset;
-}
-
-var GetJson = function() {
+var RunQuery = function() {
 	var endpoint = document.getElementById("endpoint").value;
 	var limit = document.getElementById("limit").value;
-	query = document.getElementById("queryfield").value;
-        $.ajax({
-        type: 'POST',
-        url:  prefix + '/Rest/execquery',
-        data: {"query": query,
-        	"limit" : limit,
-        	"endpoint" : endpoint},
-        dataType: 'json',
-        async: true,
-        success: function(result) {
-            sessionid = result.sessionid;
-            if(sessionid !== "error") {  
-            	document.getElementById("properties").innerHTML = "";
-            	document.getElementById("datatypes").innerHTML = "";
-            	document.getElementById("analyze").style.display = "block";
-            	document.getElementById("download").style.display = "none";
-            	//btn_filter is switched in RDFAnalyze
-            	RDFAnalyze("");
-            }
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-            alert("Query Error "+jqXHR.status + ' ' + jqXHR.responseText);
-        }
-    });
-}
-
-//RENAME in RDFAnalyze() and ButtonAnalyze()
-var result;
-
-var RDFAnalyze = function(property) {
+	var query = document.getElementById("queryfield").value;
 	$.ajax({
-        type: 'GET',
-        url:  prefix + '/Rest/analyze/'+sessionid,
-        dataType: 'json',
-        async: true,
-        success: function(data) {
-        	var out = "Properties : <br>";
-        	for(i = 0; i < data.properties; i++) {
-            	out += "<input type=\"radio\" name=\"property\" class=\"r_property\" " +
-            			"value=\""+data[i].property+"\"/>"+data[i].property+"<br>";
-        	}
-        	document.getElementById("test").innerHTML = out;
-            result = data;
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-            alert(jqXHR.status + ' ' + jqXHR.responseText);
-        }
-   });
-}
-
-
-
-var ButtonAnalyze = function() {
-    var out = "";
-    var property = $("input:radio.r_property:checked")[0].value;
-    for(i = 0; i < result.properties; i++) {
-    	
-    	if(result[i].property == property) {
-    		for(k = 0; k < result[i].numberofdatatypes; k++) {
-    			out += result[i].datatypes[k].name+" "+result[i].datatypes[k].value+"<br>"
-    		}
-    	}
-    
-    }
-    document.getElementById("test").innerHTML += out;
-}
-
-var FilterRDF = function() {
-	var p = $("input:radio.r_property:checked");
-	var o = $("input:radio.r_datatype:checked");
-    $.ajax({
-   		type: "POST",
-   		url:  prefix + "/Rest/filter",
-   		data: { "id" : sessionid ,
-   				"p" : p[0].value,
-   				"o" : o[0].value,
-   				"duplicate_filter" : "0",
-   				"query" : query }, 
-   		dataType: 'json',
-    	async: true,
-    	success: function(result) {
-    		if(result.answer == "true") {
-    			document.getElementById("download").style.display = "block";
-    		} else {
-    			alert("Filter Error");
-    		}
-   		},
-   		error: function(jqXHR, textStatus, errorThrown) {
-    	    alert(jqXHR.status + ' 222' + jqXHR.responseText);
-    	}
+		type : 'POST',
+		url : prefix + '/rdf-cf/query',
+		data : {
+			"query" : query,
+			"limit" : limit,
+			"endpoint" : endpoint
+		},
+		dataType : 'json',
+		async : true,
+		success : function(result) {
+			datakey = result.datakey;
+			if (datakey !== "") {
+				document.getElementById("delete").style.display = "block";
+				document.getElementById("label_datakey").innerHTML = result.datakey;
+				document.getElementById("filter").style.display = "block";
+				document.getElementById("download").style.display = "none";
+				// btn_filter is switched in RDFAnalyze
+				AnalyzeRDF();
+			} else {
+				alert("Query Error");
+			}
+		},
+		error : function(jqXHR, textStatus, errorThrown) {
+			alert(jqXHR.status + ' ' + jqXHR.responseText);
+		}
 	});
-}	
+}
+
+var AnalyzeRDF = function(property) {
+	$.ajax({
+		type : 'GET',
+		url : prefix + '/rdf-cf/analyze/' + datakey,
+		dataType : 'json',
+		async : true,
+		success : function(result) {
+			stats = result
+			out = "<table style=\"witdh: 99%;\">";
+			out +="<tr><th class=\"st_1\">Property</th><th class=\"st_1\">Datatype</th><th class=\"st_2\">Count</th></tr>";
+			for (var i = 0; i < result.properties; i ++ ) {
+				
+				out += "<tr><td><input type=\"radio\" name=\"property\" class=\"properties\" ";
+				out += "value=\""+result[i].property+"\"/>"+result[i].property+"</td><td>";
+				
+				for (var ii = 0; ii < result[i].numberofdatatypes; ii++) {
+					out += "<input type=\"checkbox\" class=\"datatypes\" ";
+					out += "value=\""+result[i].datatypes[ii].name+"\"/>"+result[i].datatypes[ii].name+"<br>";
+				}
+				out += "</td><td>";
+				for (var ii = 0; ii < result[i].numberofdatatypes; ii++) {
+					out += result[i].datatypes[ii].value+"<br>";
+				}
+				out += "</td></tr>";
+			}
+			out += "</table>";
+			document.getElementById("filter").style.display = "block";
+			document.getElementById("statistics").innerHTML = out;
+
+		},
+		error : function(jqXHR, textStatus, errorThrown) {
+			alert(jqXHR.status + ' ' + jqXHR.responseText);
+		}
+	});
+}
+
+var RunFilter = function() {
+	var datatypes = $('.datatypes:checked').map(function() {
+	    return this.value;
+	}).get();
+	document.getElementById("test").innerHTML = datatypes.join(",");
+	var property = $("input:radio.properties:checked");
+	
+	var remove_duplicates = false;
+	if(document.getElementById("remove_duplicates").checked) {
+		remove_duplicates = true;
+	};
+	var consistent = false;
+	if(document.getElementById("consistent").checked) {
+		consistent = true;
+	};
+	var rdfunit_params = "skip"
+	if(document.getElementById("isRDFUnitSelected").checked) {
+		rdfunit_params = document.getElementById("rdfunit_schema").value;
+		rdfunit_params += document.getElementById("rdfunit_args").value;
+	};
+	document.getElementById("test").innerHTML = datatypes.join(",")+"---"+remove_duplicates+"---"+consistent+"---"+rdfunit_params;
+	$.ajax({
+		type : "POST",
+		url : prefix + "/rdf-cf/filter/" + datakey,
+		data : {
+			"property" : property[0].value,
+			"datatypes" : datatypes.join(","),
+			"remove_duplicates" : remove_duplicates,
+			"consistent" : consistent,
+			"rdfunit_params" : rdfunit_params
+		},
+		dataType : 'json',
+		async : true,
+		success : function(result) {
+			if (result.message == "filtered") {
+				document.getElementById("download").style.display = "block";
+				alert(result.rdfunit);
+			} else {
+				alert("Filter Error");
+			}
+		},
+		error : function(jqXHR, textStatus, errorThrown) {
+			alert(jqXHR.status + ' 222' + jqXHR.responseText);
+		}
+	});
+}
 
 var DownloadRDF = function() {
 	var formatlist = document.getElementById("menue_format");
 	var format = formatlist.options[formatlist.selectedIndex].value;
-	window.open(prefix+"/Rest/dataset/"+sessionid+"?format="+format,"_blank");
+	window.open(prefix + "/rdf-cf/show/" + datakey + "?format=" + format,
+			"_blank");
 }
+
+var DeleteRDF = function() {
+	$.ajax({
+		type : "DELETE",
+		url : prefix + "rdf-cf/delete/" + datakey,
+		async : true,
+		success : function(result) {
+			if (result.message == "failed") {
+				alert("Could not delete dataset. \n Dataset not found.");
+			} else {
+				alert("deleted");
+				location.reload();
+			}
+		},
+		error : function(jqXHR, textStatus, errorThrown) {
+			alert(jqXHR.status + ' 222' + jqXHR.responseText);
+		}
+	});
+}
+
+
+
+var Foobar = function() {
+	var checkboxValues = $('.datatypes:checked').map(function() {
+	    return this.value;
+	}).get();
+//	var datatypes = "";
+//	$('.datatypes:checked').each(function() {
+//		   
+//		});
+	
+	document.getElementById("test").innerHTML = window.location.href  ;
+}
+
+
+

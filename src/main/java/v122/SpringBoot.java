@@ -58,4 +58,6 @@ public class SpringBoot {
 
 //TODO
 //filter several properties at once so you not need to save dataset_result in Filesystem
-//
+//SWAGGER API load Controller example query fix
+//Default Controller + SWAGGER + RDF_EXAMPLES
+//JSON or POJO return

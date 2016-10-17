@@ -1,7 +1,8 @@
 # RDFConsistencyFilter
 
-A RDF filter which consumes RDF Data from a SPARQL Endpoint with a CONSTRUCT-Query
-Full webinterface frontend
+A RDF filter which consumes RDF Data from a SPARQL Endpoint with a CONSTRUCT-Query.
+
+Full webinterface frontend and Swagger API documentation
 
 ## Docker
 
@@ -15,7 +16,7 @@ After build
 
     $ docker run -d --name RDF-CF -p 80:8080 #{name}
     
-Then visit you domain under port 80
+Then visit your domain under port 80
 
 ## Manually (naiv)
 

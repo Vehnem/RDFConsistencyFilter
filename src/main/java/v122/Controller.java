@@ -46,13 +46,8 @@ public class Controller {
 	
 	private static final Logger log = LoggerFactory.getLogger(Scheduler.class);
 	
-	private final String defaultConQuery = "prefix dbo: <http://dbpedia.org/ontology/> "+
-			  							   "prefix dbp: <http://dbpedia.org/property/> "+
-			  							   "construct {?film a dbo:Film. ?film dbp:runtime ?runtime.} "+				
-			  							   "where {?film a dbo:Film. ?film dbp:runtime ?runtime.} Limit 100";
+	private final String defaultConQuery = "empty";
     
-	private final String encodedConQuery = "prefix%20dbo%3A%20%3Chttp%3A%2F%2Fdbpedia.org%2Fontology%2F%3E%20prefix%20dbp%3A%20%3Chttp%3A%2F%2Fdbpedia.org%2Fproperty%2F%3E%20construct%20%7B%3Ffilm%20a%20dbo%3AFilm.%20%3Ffilm%20dbp%3Aruntime%20%3Fruntime.%7D%20where%20%7B%3Ffilm%20a%20dbo%3AFilm.%20%3Ffilm%20dbp%3Aruntime%20%3Fruntime.%7D%20Limit%20100";
-	
     /**
      * Get RDF from a Sparql-endpoint over a CONSTRUCT Query
      * and save the result at the file-system
@@ -117,10 +112,17 @@ public class Controller {
     									@RequestParam(value="format", defaultValue="TURTLE") String format) {
     	Model model = ModelFactory.createDefaultModel();
 		
+    	String root;
+    	if( datakey.equals( "film_runtime_100") ) {
+    		root = "./RDF_EXAMPLES/";
+    	} else {
+    		root = "./RDF_DATA/";
+    	}
+    	
     	switch (format) {
     		case "TURTLE":  
     	    	try( final ByteArrayOutputStream os = new ByteArrayOutputStream() ){
-    	    		model.read("./RDF_DATA/"+datakey+"/result.nt", "N-TRIPLES");
+    	    		model.read(root+datakey+"/result.nt", "N-TRIPLES");
     	    		model.write(os, "TURTLE");
     	    		return os.toString();
     	    	} catch (IOException e) {
@@ -129,7 +131,7 @@ public class Controller {
     			}
     		case "N-TRIPLES":
     	    	try( final ByteArrayOutputStream os = new ByteArrayOutputStream() ){
-    	    		model.read("./RDF_DATA/"+datakey+"/result.nt", "N-TRIPLES");
+    	    		model.read(root+datakey+"/result.nt", "N-TRIPLES");
     	    		model.write(os, "N-TRIPLES");
     	    		return os.toString();
     	    	} catch (IOException e) {
@@ -155,7 +157,16 @@ public class Controller {
 	public @ResponseBody String analyzeRDF(@PathVariable(value="datakey")String datakey) {
     	
     	String response = "{ ";
-    	RDFAnalyze ra = new RDFAnalyze(ModelFactory.createDefaultModel().read("./RDF_DATA/"+datakey+"/dataset.nt", "N-TRIPLES"));
+    	
+    	String root;
+    	if( datakey.equals( "film_runtime_100") ) {
+    		root = "./RDF_EXAMPLES/";
+    	} else {
+    		root = "./RDF_DATA/";
+    	}
+    	
+    	RDFAnalyze ra = new RDFAnalyze(ModelFactory.createDefaultModel().read(root+datakey+"/dataset.nt", "N-TRIPLES"));
+    	
     	ArrayList<String> properties = ra.possibleProperties();
     	
     	for ( int i = 0 ; i < properties.size(); i++ ) {
@@ -201,9 +212,9 @@ public class Controller {
      */
     @ApiOperation(value = "filter", nickname = "filterRDF")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "datakey", value ="", required = true, dataType = "string", paramType = "path", defaultValue="film_runtime_100"),
+        @ApiImplicitParam(name = "datakey", value ="Key", required = true, dataType = "string", paramType = "path", defaultValue="film_runtime_100"),
         @ApiImplicitParam(name = "property",  value ="", required = true, dataType = "string", paramType = "query", defaultValue="http://dbpedia.org/property/runtime"),
-        @ApiImplicitParam(name = "datatypes",  value ="", required = true, dataType = "string", paramType = "query", defaultValue="http://www.w3.org/2001/XMLSchema#integer"),
+        @ApiImplicitParam(name = "datatypes",  value ="Datatypes comma seperated list", required = true, dataType = "string", paramType = "query", defaultValue="http://www.w3.org/2001/XMLSchema#integer"),
         @ApiImplicitParam(name = "remove_duplicates",value ="", required = false, dataType = "boolean", paramType = "query", defaultValue="true"),
         @ApiImplicitParam(name = "consistent", value ="", required = false, dataType = "boolean", paramType = "query", defaultValue="true"),
         @ApiImplicitParam(name = "rdfunit_params", value ="", required = false, dataType = "string", paramType = "query", defaultValue="skip")
@@ -216,9 +227,16 @@ public class Controller {
     										  @RequestParam( value = "remove_duplicates", defaultValue="true")boolean remove_duplicates,
     										  @RequestParam( value = "consistent", defaultValue="true")boolean consistent,
     										  @RequestParam( value = "rdfunit_params", defaultValue="")String rdfunit_params ) {
-       			
-    	RDFFilter rf = new RDFFilter(ModelFactory.createDefaultModel().read("./RDF_DATA/"+datakey+"/dataset.nt", "N-TRIPLES"));
+       	
+    	String root;
+    	if( datakey.equals( "film_runtime_100") ) {
+    		root = "./RDF_EXAMPLES/";
+    	} else {
+    		root = "./RDF_DATA/";
+    	}
     	
+    	RDFFilter rf = new RDFFilter(ModelFactory.createDefaultModel().read(root+datakey+"/dataset.nt", "N-TRIPLES"));
+ 
     	
     	List<String> datatypelist = Arrays.asList(datatypes.split("\\s*,\\s*"));
     	
@@ -226,7 +244,7 @@ public class Controller {
     		String rdfunit_msg ="skipped";
         	Model model = rf.new_filter( property , datatypelist , remove_duplicates , consistent);
         	
-    		FileOutputStream fileStream = new FileOutputStream(new File("./RDF_DATA/"+datakey+"/result.nt"));
+    		FileOutputStream fileStream = new FileOutputStream(new File(root+datakey+"/result.nt"));
     		OutputStreamWriter outputWriter = new OutputStreamWriter(fileStream, "UTF-8");
     		
     		model.write(outputWriter, "N-TRIPLES");
@@ -235,7 +253,7 @@ public class Controller {
     		//RDFUnit TODO
     		if( false == rdfunit_params.equals("skip")) {
     			OnRDFUnit rdfu = new OnRDFUnit();
-    			String params = "-d ../RDFConsistencyFilter/RDF_DATA/"+datakey+"/result.nt";
+    			String params = "-d ../RDFConsistencyFilter/RDF_EXAMPLES/film_runtime_100/result_dataset.nt";
     			rdfunit_msg = rdfu.runRDFUnit_cmdline(params);
     		}
         	return "{ \"message\" : \"filtered\" , \"rdfunit\" : \""+rdfunit_msg +"\"}";

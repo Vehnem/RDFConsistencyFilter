@@ -3,6 +3,7 @@ package v122;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,8 +29,8 @@ public class OnRDFUnit {
 	public String runRDFUnit_cmdline(String params) {
 		String result = "";
 
-		String[] cmd = { "/bin/sh", "-c", "cd ../RDFUnit-0.8; bin/rdfunit" + params };
-
+		String[] cmd = { "/bin/sh", "-c", "cd ../RDFUnit-0.8; bin/rdfunit " + params };
+		log.info(Arrays.toString(cmd));
 		try {
 			log.info("RDFUnit start");
 			Process p = Runtime.getRuntime().exec(cmd);

@@ -1,0 +1,6 @@
+<http://dbpedia.org/resource/Iron_Ridge_(film)> <http://dbpedia.org/property/runtime> "85"^^<http://www.w3.org/2001/XMLSchema#integer> .
+<http://dbpedia.org/resource/Iron_Ridge_(film)> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/ontology/Film> .
+<http://dbpedia.org/resource/An_American_Girl:_Grace_Stirs_Up_Success> <http://dbpedia.org/property/runtime> "99"^^<http://www.w3.org/2001/XMLSchema#integer> .
+<http://dbpedia.org/resource/An_American_Girl:_Grace_Stirs_Up_Success> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/ontology/Film> .
+<http://dbpedia.org/resource/Alpha_and_Omega_(film_series)> <http://dbpedia.org/property/runtime> "180"^^<http://www.w3.org/2001/XMLSchema#integer> .
+<http://dbpedia.org/resource/Alpha_and_Omega_(film_series)> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/ontology/Film> .

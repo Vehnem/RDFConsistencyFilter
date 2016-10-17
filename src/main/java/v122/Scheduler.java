@@ -35,7 +35,7 @@ public class Scheduler {
 			long time_diff = Long.valueOf(new SimpleDateFormat("mm").format(System.currentTimeMillis() - m.lastModified()));
 			
 			if(time_diff > 30) {
-				deleteFolder(m);
+				if( false == subdir.toString().equals( "README.md") ) deleteFolder(m);
 				log.info("Deleted : "+subdir.toString());
 			} else {
 				log.info((30 -time_diff)+" min remain for "+subdir.toString());

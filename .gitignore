@@ -1,3 +1,10 @@
-.sh
+
+target/
 .settings/
+
+# RDF_DATA
+RDF_DATA/*/
+
+# Eclipse
+.project.xml
 .classpath

@@ -18,13 +18,24 @@ After build
 Then visit you domain under port 80
 
 ## Manually (naiv)
+
+Prepare App Folder
+
     $ mkdir #{app_folder}
     $ cd #{app_folder}
+    
+Prepare RDFUnit
+    
+    $ git clone https://github.com/AKSW/RDFUnit.git 
+    & cd RDFUnit/ && mvn -pl rdfunit-validate -am clean install
+    
+Prepare RDFConsistencyFilter
+    
     $ git clone git@github.com:Vehnem/RDFConsistencyFilter.git
-    $ cd RDFConsistencyFilter/
-    $ mvn package
-    $ cd ../
-    $
+    $ cd RDFConsistencyFilter/ && mvn package && cd ../
+    
+Run App
+
     $ java -jar target/RDFConsistencyFilter-0.0.1-SNAPSHOT.jar
 
 Then visit localhost:8080

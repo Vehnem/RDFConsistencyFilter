@@ -27,7 +27,7 @@ Prepare App Folder
 Prepare RDFUnit
     
     $ git clone https://github.com/AKSW/RDFUnit.git 
-    & cd RDFUnit/ && mvn -pl rdfunit-validate -am clean install
+    $ cd RDFUnit/ && mvn -pl rdfunit-validate -am clean install
     
 Prepare RDFConsistencyFilter
     

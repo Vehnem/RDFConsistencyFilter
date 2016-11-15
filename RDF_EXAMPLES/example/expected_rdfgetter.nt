@@ -1,0 +1,17 @@
+<http://dbpedia.org/resource/A_Soap> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/ontology/Film> .
+<http://dbpedia.org/resource/A_Soap> <http://dbpedia.org/property/runtime> "6240.0"^^<http://dbpedia.org/datatype/second> .
+<http://dbpedia.org/resource/A_Star_Is_Born_(1954_film)> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/ontology/Film> .
+<http://dbpedia.org/resource/A_Star_Is_Born_(1954_film)> <http://dbpedia.org/property/runtime> "General Release:"@en .
+<http://dbpedia.org/resource/A_Star_Is_Born_(1954_film)> <http://dbpedia.org/property/runtime> "10920.0"^^<http://dbpedia.org/datatype/second> .
+<http://dbpedia.org/resource/A_Star_Is_Born_(1954_film)> <http://dbpedia.org/property/runtime> "10560.0"^^<http://dbpedia.org/datatype/second> .
+<http://dbpedia.org/resource/A_Star_Is_Born_(1954_film)> <http://dbpedia.org/property/runtime> "9240.0"^^<http://dbpedia.org/datatype/second> .
+<http://dbpedia.org/resource/A_Beautiful_Mind_(film)> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/ontology/Film> .
+<http://dbpedia.org/resource/A_Beautiful_Mind_(film)> <http://dbpedia.org/property/runtime> "8100.0"^^<http://dbpedia.org/datatype/second> .
+<http://dbpedia.org/resource/A_Star_Is_Born_(1937_film)> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/ontology/Film> .
+<http://dbpedia.org/resource/A_Star_Is_Born_(1937_film)> <http://dbpedia.org/property/runtime> "6660.0"^^<http://dbpedia.org/datatype/second> .
+<http://dbpedia.org/resource/A_Few_Good_Men> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/ontology/Film> .
+<http://dbpedia.org/resource/A_Few_Good_Men> <http://dbpedia.org/property/runtime> "8280.0"^^<http://dbpedia.org/datatype/second> .
+<http://dbpedia.org/resource/(T)error> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/ontology/Film> .
+<http://dbpedia.org/resource/(T)error> <http://dbpedia.org/property/runtime> "5580.0"^^<http://dbpedia.org/datatype/second> .
+<http://dbpedia.org/resource/ABBA:_The_Movie> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/ontology/Film> .
+<http://dbpedia.org/resource/ABBA:_The_Movie> <http://dbpedia.org/property/runtime> "5820.0"^^<http://dbpedia.org/datatype/second> .

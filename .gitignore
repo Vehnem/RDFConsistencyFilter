@@ -1,8 +1,9 @@
 
+dump
 target/
 .settings/
 
-# RDF_DATA
+# RDF_DATA/.gitkeep
 RDF_DATA/*/
 
 # Eclipse

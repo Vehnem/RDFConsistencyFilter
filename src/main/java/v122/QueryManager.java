@@ -65,6 +65,7 @@ public class QueryManager {
 /*
  * Check select, construct, ask, describe
  */
+	@SuppressWarnings("unused")
 	private static String queryType(String queryStr) {
 		Query query = QueryFactory.create(queryStr);
 		

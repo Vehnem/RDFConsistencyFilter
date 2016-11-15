@@ -1,16 +1,21 @@
-package v122.test;
-//import static org.junit.Assert.*;
+package v122;
+
+import static org.junit.Assert.*;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
+import junit.framework.Assert;
 import v122.QueryManager;
 
+/**
+ * Creates a CONSTRUCT QUERY from a SELECT QUERY
+ * 
+ * @author marvin
+ *
+ */
+@SuppressWarnings("deprecation")
 public class QueryManagerTest {
 	
 	/*
@@ -42,22 +47,6 @@ public class QueryManagerTest {
 			  
 	*/
 
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-	}
-
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-	}
-
-	@Before
-	public void setUp() throws Exception {
-	}
-
-	@After
-	public void tearDown() throws Exception {
-	}
-
 	@Test
 	public void test() {
 		
@@ -70,9 +59,29 @@ public class QueryManagerTest {
 				+ " ?Book a dbo:Book. ?Book dbp:page ?page.} Limit 100 ";
 		
 		
+		String cq_film_runtime_org ="prefix dbo: <http://dbpedia.org/ontology/>"+
+				  "prefix dbp: <http://dbpedia.org/property/>"+
+				  "construct {?film a dbo:Film. ?film dbp:runtime ?runtime.} "+				
+				  "where {?film a dbo:Film. ?film dbp:runtime ?runtime.}";
+		
+		String cq_film_runtime = "CONSTRUCT { "+
+								 "?film <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/ontology/Film> . "+
+								 "?film <http://dbpedia.org/property/runtime> ?runtime . "+
+								 "} "+
+								 "WHERE "+
+								 "{ ?film  a                     <http://dbpedia.org/ontology/Film> ; "+
+								 "<http://dbpedia.org/property/runtime>  ?runtime "+
+								 "} "+
+								 "OFFSET  10 "+
+								 "LIMIT   20";
+		
 		QueryManager qm = new QueryManager(q_film_runtime);
 		
-		System.out.println(qm.getQuery().toString());
+		Query q = QueryFactory.create(cq_film_runtime_org);
+		
+		System.out.println(q.toString());
+			
+		assertEquals(QueryFactory.create(cq_film_runtime),QueryFactory.create(qm.getQuery()));
 	}
 
 }

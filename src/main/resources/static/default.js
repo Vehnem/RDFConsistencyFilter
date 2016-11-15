@@ -8,7 +8,7 @@ var RunQuery = function() {
 	var query = document.getElementById("queryfield").value;
 	$.ajax({
 		type : 'POST',
-		url : prefix + '/rdf-cf/query',
+		url : prefix + '/rdfcf/v1/query',
 		data : {
 			"query" : query,
 			"limit" : limit,
@@ -38,7 +38,7 @@ var RunQuery = function() {
 var AnalyzeRDF = function(property) {
 	$.ajax({
 		type : 'GET',
-		url : prefix + '/rdf-cf/analyze/' + datakey,
+		url : prefix + '/rdfcf/v1/analyze/' + datakey,
 		dataType : 'json',
 		async : true,
 		success : function(result) {
@@ -47,8 +47,7 @@ var AnalyzeRDF = function(property) {
 			out +="<tr><th class=\"st_1\">Property</th><th class=\"st_1\">Datatype</th><th class=\"st_2\">Count</th></tr>";
 			for (var i = 0; i < result.properties; i ++ ) {
 				
-				out += "<tr><td><input type=\"radio\" name=\"property\" class=\"properties\" ";
-				out += "value=\""+result[i].property+"\"/>"+result[i].property+"</td><td>";
+				out += "<tr><td>"+result[i].property+"</td><td>";
 				
 				for (var ii = 0; ii < result[i].numberofdatatypes; ii++) {
 					out += "<input type=\"checkbox\" class=\"datatypes\" ";
@@ -76,7 +75,8 @@ var RunFilter = function() {
 	    return this.value;
 	}).get();
 	document.getElementById("test").innerHTML = datatypes.join(",");
-	var property = $("input:radio.properties:checked");
+	var property = "";
+		//$("input:checkbox.properties:checked");
 	
 	var remove_duplicates = false;
 	if(document.getElementById("remove_duplicates").checked) {
@@ -94,10 +94,10 @@ var RunFilter = function() {
 	document.getElementById("test").innerHTML = datatypes.join(",")+"---"+remove_duplicates+"---"+consistent+"---"+rdfunit_params;
 	$.ajax({
 		type : "POST",
-		url : prefix + "/rdf-cf/filter/" + datakey,
+		url : prefix + "/rdfcf/v1/filter/" + datakey,
 		data : {
-			"property" : property[0].value,
-			"datatypes" : datatypes.join(","),
+			"property" : property,
+			"datatyp" : datatypes.join(","),
 			"remove_duplicates" : remove_duplicates,
 			"consistent" : consistent,
 			"rdfunit_params" : rdfunit_params
@@ -121,14 +121,14 @@ var RunFilter = function() {
 var DownloadRDF = function() {
 	var formatlist = document.getElementById("menue_format");
 	var format = formatlist.options[formatlist.selectedIndex].value;
-	window.open(prefix + "/rdf-cf/show/" + datakey + "?format=" + format,
+	window.open(prefix + "/rdfcf/v1/show/" + datakey + "?format=" + format,
 			"_blank");
 }
 
 var DeleteRDF = function() {
 	$.ajax({
 		type : "DELETE",
-		url : prefix + "rdf-cf/delete/" + datakey,
+		url : prefix + "rdfcf/v1/delete/" + datakey,
 		async : true,
 		success : function(result) {
 			if (result.message == "failed") {

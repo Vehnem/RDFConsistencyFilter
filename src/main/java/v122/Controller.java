@@ -1,16 +1,12 @@
 package v122;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,7 +20,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
 
@@ -36,8 +31,8 @@ import io.swagger.annotations.ApiResponses;
  * only encoded queries supported (because of <...> parts)   
  */
 @RestController
-@Api(value="rdf-cf", description="RDF consistency filter - RestController")
-@RequestMapping(value = "/rdf-cf")
+@Api(value="rdfcf-v1", description="RDF consistency filter - RestController")
+@RequestMapping(value = "/rdfcf/v1")
 public class Controller {
 	
 //	private final String defaultSelQuery = "prefix dbo: <http://dbpedia.org/ontology/>"+
@@ -68,9 +63,13 @@ public class Controller {
     										 @RequestParam(value="limit",required=true, defaultValue="")long limit,
     										 @RequestParam(value="query",required=true, defaultValue="")String query) {
     	try{
-    		RDFGetter rg = new RDFGetter(endpoint, limit, query);
+    		Model model = new RDFGetter().getRDF(query, endpoint, limit);
+    		
+    		SingletonStore store = SingletonStore.getInstance();
+    		
+    		String datakey = store.addRDFData(model);
     		log.info("loaded");
-    		return "{ \"datakey\" : \""+rg.getDataKey()+"\" }";
+    		return "{ \"datakey\" : \""+datakey+"\" }";
     	}
     	catch(Exception e) {
     		return "{ \"datakey\" : \"\" }";
@@ -110,19 +109,15 @@ public class Controller {
     @RequestMapping(value="/show/{datakey}", method=RequestMethod.GET, produces={"text/text;charset=UTF-8"})
     public @ResponseBody String showRDF(@PathVariable String datakey,
     									@RequestParam(value="format", defaultValue="TURTLE") String format) {
-    	Model model = ModelFactory.createDefaultModel();
-		
-    	String root;
-    	if( datakey.equals( "film_runtime_100") ) {
-    		root = "./RDF_EXAMPLES/";
-    	} else {
-    		root = "./RDF_DATA/";
-    	}
+    	
+    	SingletonStore store = SingletonStore.getInstance();
+    	
+    	Model model = store.getRDFDataResult(datakey);
+    	
     	
     	switch (format) {
     		case "TURTLE":  
     	    	try( final ByteArrayOutputStream os = new ByteArrayOutputStream() ){
-    	    		model.read(root+datakey+"/result.nt", "N-TRIPLES");
     	    		model.write(os, "TURTLE");
     	    		return os.toString();
     	    	} catch (IOException e) {
@@ -131,7 +126,6 @@ public class Controller {
     			}
     		case "N-TRIPLES":
     	    	try( final ByteArrayOutputStream os = new ByteArrayOutputStream() ){
-    	    		model.read(root+datakey+"/result.nt", "N-TRIPLES");
     	    		model.write(os, "N-TRIPLES");
     	    		return os.toString();
     	    	} catch (IOException e) {
@@ -157,15 +151,8 @@ public class Controller {
 	public @ResponseBody String analyzeRDF(@PathVariable(value="datakey")String datakey) {
     	
     	String response = "{ ";
-    	
-    	String root;
-    	if( datakey.equals( "film_runtime_100") ) {
-    		root = "./RDF_EXAMPLES/";
-    	} else {
-    		root = "./RDF_DATA/";
-    	}
-    	
-    	RDFAnalyze ra = new RDFAnalyze(ModelFactory.createDefaultModel().read(root+datakey+"/dataset.nt", "N-TRIPLES"));
+    	SingletonStore store = SingletonStore.getInstance();
+    	RDFAnalyze ra = new RDFAnalyze(store.getRDFData(datakey));
     	
     	ArrayList<String> properties = ra.possibleProperties();
     	
@@ -222,40 +209,35 @@ public class Controller {
     })
     @RequestMapping(value="/filter/{datakey}", method=RequestMethod.POST , produces={"application/json"})
     public @ResponseBody String filterRDF(@PathVariable String datakey, 
-    										  @RequestParam( value = "property", defaultValue="http://dbpedia.org/property/runtime")String property,
-    										  @RequestParam( value = "datatypes", defaultValue="http://www.w3.org/2001/XMLSchema#integer")String datatypes,      	
+    										  @RequestParam( value = "property", defaultValue="http://dbpedia.org/property/runtime")String[] properties,
+    										  @RequestParam( value = "datatyp", defaultValue="http://www.w3.org/2001/XMLSchema#integer")String[] datatypes,      	
     										  @RequestParam( value = "remove_duplicates", defaultValue="true")boolean remove_duplicates,
     										  @RequestParam( value = "consistent", defaultValue="true")boolean consistent,
     										  @RequestParam( value = "rdfunit_params", defaultValue="")String rdfunit_params ) {
-       	
-    	String root;
-    	if( datakey.equals( "film_runtime_100") ) {
-    		root = "./RDF_EXAMPLES/";
-    	} else {
-    		root = "./RDF_DATA/";
+    	
+    	SingletonStore store = SingletonStore.getInstance();
+    	RDFFilter rf = new RDFFilter(store.getRDFData(datakey));
+    	List<List<String>> datatypelist = new ArrayList<List<String>>();
+    	for(String d : datatypes) {
+    		datatypelist.add(Arrays.asList(d.split(",")));
+    		log.info(Arrays.toString(d.split(",")));
     	}
+    	List<String> propertylist = Arrays.asList(properties);
     	
-    	RDFFilter rf = new RDFFilter(ModelFactory.createDefaultModel().read(root+datakey+"/dataset.nt", "N-TRIPLES"));
- 
-    	
-    	List<String> datatypelist = Arrays.asList(datatypes.split("\\s*,\\s*"));
+    	log.info(Arrays.toString(properties));
     	
     	try {
     		String rdfunit_msg ="skipped";
-        	Model model = rf.new_filter( property , datatypelist , remove_duplicates , consistent);
-        	
-    		FileOutputStream fileStream = new FileOutputStream(new File(root+datakey+"/result.nt"));
-    		OutputStreamWriter outputWriter = new OutputStreamWriter(fileStream, "UTF-8");
+        	Model model = rf.new_filter2( propertylist , datatypelist , remove_duplicates , consistent);
+        
+        	store.addRDFDataResult(datakey, model);
     		
-    		model.write(outputWriter, "N-TRIPLES");
-    		model.close();
-    		
-    		//RDFUnit TODO
-    		if( false == rdfunit_params.equals("skip")) {
-    			OnRDFUnit rdfu = new OnRDFUnit();
-    			String params = "-d ../RDFConsistencyFilter/RDF_EXAMPLES/film_runtime_100/result_dataset.nt";
-    			rdfunit_msg = rdfu.runRDFUnit_cmdline(params);
-    		}
+//    		//RDFUnit TODO
+//    		if( false == rdfunit_params.equals("skip")) {
+//    			OnRDFUnit rdfu = new OnRDFUnit();
+//    			String params = "-d ../RDFConsistencyFilter/RDF_EXAMPLES/film_runtime_100/result_dataset.nt";
+//    			rdfunit_msg = rdfu.runRDFUnit_cmdline(params);
+//    		}
         	return "{ \"message\" : \"filtered\" , \"rdfunit\" : \""+rdfunit_msg +"\"}";
     	} catch (Exception e) {
     		return "{ \"message\" : \"failed\" }";
@@ -282,11 +264,12 @@ public class Controller {
     })
     @RequestMapping(value="/delete/{datakey}", method=RequestMethod.DELETE )
     public String deleteDataset(@PathVariable(value="datakey") String datakey) {
-    	File folder = new File("./RDF_DATA/"+datakey);
+    	
+    	SingletonStore store = SingletonStore.getInstance();
     	
     	try
     	{
-    		new RDFStore().deleteFolder(folder);   
+    		store.deleteRDFData(datakey);
         	return "{ \"message\" : \"deleted\" }";
     	} 
     	catch(Exception e) 
@@ -294,5 +277,22 @@ public class Controller {
     		return "{ \"message\" : \"failed\" }";
     	}
     	
+    }
+    
+    /**
+     * Multiple Value Test
+     */
+    @RequestMapping(value="/test" , method=RequestMethod.GET)
+    public String method(@RequestParam(value="filter") String[] filter){
+           	
+    	ArrayList<String> p = new ArrayList<String>();
+    	ArrayList<String> o = new ArrayList<String>();
+    	
+    	for(String f : filter) {
+    		p.add(f.split(":")[0]);
+    		o.add(f.split(":")[1]);
+    	}
+    	
+    	return p.toString()+"<br>"+o.toString();
     }
 }

@@ -26,6 +26,19 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 public class SpringBoot {
 
 	public static void main(String[] args) {
+		
+		/*
+		 * Store prepare
+		 */
+		
+		SingletonStore store = SingletonStore.getInstance();
+		
+		//useMemory ?
+		store.init(false);
+		
+		/*
+		 * Spring start
+		 */
 		SpringApplication.run(SpringBoot.class, args);
 	}
 
@@ -40,10 +53,14 @@ public class SpringBoot {
 				.groupName("default")
 				.apiInfo(apiInfo())
 				.select()
-				.paths(regex("/rdf-cf.*")).build();
+				.paths(regex("/rdfcf.*")).build();
 	}
 
-	//@Override
+	/**
+	 * ApiInfo configuration
+	 * 
+	 * @return
+	 */
 	private ApiInfo apiInfo() {
 		return new ApiInfoBuilder().title("Api Information").
 				description("Api Information with SWAGGER")
@@ -56,8 +73,28 @@ public class SpringBoot {
 	}
 }
 
+//Info
+
+
+
 //TODO
-//filter several properties at once so you not need to save dataset_result in Filesystem
-//SWAGGER API load Controller example query fix
-//Default Controller + SWAGGER + RDF_EXAMPLES
-//JSON or POJO return
+//More UnitTests
+//+SWAGGER API load Controller example query fix
+//(-JSON or POJO return) not needed yet
+
+//+model.close() after remove from HashMap
+//+Store raw and result data? : both
+//+Add more comments to classes, variables, etc.
+//+multi-select in UI for properties
+//-how to pass multiple values ajax request
+//(-File for known queries ++Issue prefix use or non prefix use)
+ 	
+//+add Version tag to Interface (REST) (UnitTests)
+//-Url versioning at the moment. go for the accept header
+
+//+No mult threading supported ?
+//-benchmark
+//-RDFUnit in OnRDFUnit.java --> call library directly imported for MemoryStore
+
+//-install your service on SDW server
+

@@ -199,9 +199,8 @@ public class Controller {
      */
     @ApiOperation(value = "filter", nickname = "filterRDF")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "datakey", value ="Key", required = true, dataType = "string", paramType = "path", defaultValue="film_runtime_100"),
-        @ApiImplicitParam(name = "property",  value ="", required = true, dataType = "string", paramType = "query", defaultValue="http://dbpedia.org/property/runtime"),
-        @ApiImplicitParam(name = "datatypes",  value ="Datatypes comma seperated list", required = true, dataType = "string", paramType = "query", defaultValue="http://www.w3.org/2001/XMLSchema#integer"),
+        @ApiImplicitParam(name = "datakey", value ="Key", required = true, dataType = "string", paramType = "path", defaultValue="example"),
+        @ApiImplicitParam(name = "filter",  value ="p+d1,d2", required = true, dataType = "string", paramType = "query", defaultValue="http://dbpedia.org/property/runtime;http://www.w3.org/2001/XMLSchema#integer"),
         @ApiImplicitParam(name = "remove_duplicates",value ="", required = false, dataType = "boolean", paramType = "query", defaultValue="true"),
         @ApiImplicitParam(name = "consistent", value ="", required = false, dataType = "boolean", paramType = "query", defaultValue="true"),
         @ApiImplicitParam(name = "rdfunit_params", value ="", required = false, dataType = "string", paramType = "query", defaultValue="skip")
@@ -209,22 +208,31 @@ public class Controller {
     })
     @RequestMapping(value="/filter/{datakey}", method=RequestMethod.POST , produces={"application/json"})
     public @ResponseBody String filterRDF(@PathVariable String datakey, 
-    										  @RequestParam( value = "property", defaultValue="http://dbpedia.org/property/runtime")String[] properties,
-    										  @RequestParam( value = "datatyp", defaultValue="http://www.w3.org/2001/XMLSchema#integer")String[] datatypes,      	
+    										  @RequestParam( value = "filter[]", defaultValue="http://dbpedia.org/property/runtime;http://www.w3.org/2001/XMLSchema#integer")String[] filter,    	
     										  @RequestParam( value = "remove_duplicates", defaultValue="true")boolean remove_duplicates,
     										  @RequestParam( value = "consistent", defaultValue="true")boolean consistent,
     										  @RequestParam( value = "rdfunit_params", defaultValue="")String rdfunit_params ) {
     	
     	SingletonStore store = SingletonStore.getInstance();
     	RDFFilter rf = new RDFFilter(store.getRDFData(datakey));
-    	List<List<String>> datatypelist = new ArrayList<List<String>>();
-    	for(String d : datatypes) {
-    		datatypelist.add(Arrays.asList(d.split(",")));
-    		log.info(Arrays.toString(d.split(",")));
-    	}
-    	List<String> propertylist = Arrays.asList(properties);
     	
-    	log.info(Arrays.toString(properties));
+    	List<String> propertylist = new ArrayList<String>();
+    	List<List<String>> datatypelist = new ArrayList<List<String>>();
+    	
+    	log.info(Arrays.toString(filter));
+    	
+    	for(String f : filter){
+    		String[] splited = f.split(";");
+    		List<String> types = new ArrayList<String>();
+    		for(int i = 0; i < splited.length; i++) {
+    			if(i == 0) {
+    				propertylist.add(splited[i]);
+    			} else {
+    				types.add(splited[i]);
+    			}
+    		} 
+    		datatypelist.add(types);
+    	}
     	
     	try {
     		String rdfunit_msg ="skipped";

@@ -56,7 +56,7 @@ public class RDFGetter {
 		
 		Query query = QueryFactory.create(queryString);
 		QueryEngineHTTP queryExec;
-		Model model;
+		Model model = ModelFactory.createDefaultModel();
 		
 		//
 		long packetsize = getPackagesize("") + endpointLimit/10 ; // TODO function
@@ -110,7 +110,7 @@ public class RDFGetter {
 			model.close();
 		}
 		catch ( Exception e ) {
-			
+			e.printStackTrace(System.out);
 			log.info("failed to get RDF-data");
 			
 		} 

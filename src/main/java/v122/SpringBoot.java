@@ -34,7 +34,7 @@ public class SpringBoot {
 		SingletonStore store = SingletonStore.getInstance();
 		
 		//useMemory ?
-		store.init(false);
+		store.init(true);
 		
 		/*
 		 * Spring start
@@ -80,6 +80,7 @@ public class SpringBoot {
 //TODO
 //More UnitTests
 //+SWAGGER API load Controller example query fix
+//Escape Uri <http> with sign
 //(-JSON or POJO return) not needed yet
 
 //+model.close() after remove from HashMap

@@ -50,7 +50,7 @@ var AnalyzeRDF = function(property) {
 				out += "<tr><td>"+result[i].property+"</td><td>";
 				
 				for (var ii = 0; ii < result[i].numberofdatatypes; ii++) {
-					out += "<input type=\"checkbox\" class=\"datatypes\" ";
+					out += "<input type=\"checkbox\" class=\"datatypes\" name=\""+result[i].property+"\"";
 					out += "value=\""+result[i].datatypes[ii].name+"\"/>"+result[i].datatypes[ii].name+"<br>";
 				}
 				out += "</td><td>";
@@ -70,14 +70,34 @@ var AnalyzeRDF = function(property) {
 	});
 }
 
+var FilterAttr = function() {
+	var result = [];
+	var boxes = $('.datatypes:checked');
+	var out = "";
+	var tmp_p = "";
+	var tmp = "";
+	if(boxes.length > 0) {
+		tmp_p = boxes[0].getAttribute("name");
+		tmp = boxes[0].getAttribute("name");
+	}
+	for(i = 0; i < boxes.length; i++) {
+		//TODO how to split p from d
+		if(boxes[i].getAttribute("name") != tmp_p) {
+			result.push(tmp);
+			tmp_p = boxes[i].getAttribute("name");
+			tmp = tmp_p+";"+boxes[i].value;
+		} else {
+
+			tmp += ";" + boxes[i].value;
+		}
+	}
+	result.push(tmp);
+
+	return result;
+}
+
 var RunFilter = function() {
-	var datatypes = $('.datatypes:checked').map(function() {
-	    return this.value;
-	}).get();
-	document.getElementById("test").innerHTML = datatypes.join(",");
-	var property = "";
-		//$("input:checkbox.properties:checked");
-	
+
 	var remove_duplicates = false;
 	if(document.getElementById("remove_duplicates").checked) {
 		remove_duplicates = true;
@@ -91,14 +111,28 @@ var RunFilter = function() {
 		rdfunit_params = document.getElementById("rdfunit_schema").value;
 		rdfunit_params += document.getElementById("rdfunit_args").value;
 	};
-	document.getElementById("test").innerHTML = datatypes.join(",")+"---"+remove_duplicates+"---"+consistent+"---"+rdfunit_params;
+	
+	var filter = FilterAttr();
+	
+	var po_ar = FilterAttr();
+	
+	//data: "{'data1':'" + value1+ "', 'data2':'" + value2+ "', 'data3':'" + value3+ "'}",
+//	
+//	for(i = 0; i < po_ar.length; i++) {
+//		if(i == po_ar.length-1)
+//			filter += "'filter':'"+po_ar[i]+"'";
+//		else {
+//			filter += "'filter':'"+po_ar[i]+"', "
+//		}
+//	}
+	
+	//document.getElementById("test").innerHTML = "---"+remove_duplicates+"---"+consistent+"---"+rdfunit_params;
 	$.ajax({
 		type : "POST",
 		url : prefix + "/rdfcf/v1/filter/" + datakey,
 		data : {
-			"property" : property,
-			"datatyp" : datatypes.join(","),
-			"remove_duplicates" : remove_duplicates,
+			filter,
+			remove_duplicates,
 			"consistent" : consistent,
 			"rdfunit_params" : rdfunit_params
 		},
@@ -107,13 +141,13 @@ var RunFilter = function() {
 		success : function(result) {
 			if (result.message == "filtered") {
 				document.getElementById("download").style.display = "block";
-				alert(result.rdfunit);
+				document.getElementById("test").innerHtml += "done ";
 			} else {
 				alert("Filter Error");
 			}
 		},
 		error : function(jqXHR, textStatus, errorThrown) {
-			alert(jqXHR.status + ' 222' + jqXHR.responseText);
+			alert('Error'+jqXHR.status + ' 222' + jqXHR.responseText);
 		}
 	});
 }

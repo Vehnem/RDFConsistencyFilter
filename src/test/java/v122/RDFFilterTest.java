@@ -41,7 +41,7 @@ public class RDFFilterTest {
 	@Rule
 	public TemporaryFolder folder = new TemporaryFolder();
 	
-	static Model model;
+	static Model model = ModelFactory.createDefaultModel();
 	
 	static RDFFilter rf;
 	

@@ -1,6 +1,7 @@
-package v122;
+package rdfcf;
 
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 
 /**
  * Program configuration
@@ -34,7 +35,7 @@ public final class SingletonStore implements StoreInterface {
 	 * 
 	 * @param useMemory
 	 */
-	public static void init(final boolean useMemory) {
+	public void init(final boolean useMemory) {
 
 		SingletonStore.useMemory = useMemory;
 
@@ -53,6 +54,11 @@ public final class SingletonStore implements StoreInterface {
 	@Override
 	public String addRDFData(Model model) {
 		return SingletonStore.storeInstance.addRDFData(model);
+	}
+	
+	@Override
+	public void addRDFData(Model model, String datakey) {
+		SingletonStore.storeInstance.addRDFData(model, datakey);
 	}
 
 	@Override
@@ -86,5 +92,18 @@ public final class SingletonStore implements StoreInterface {
 	@Override
 	public Model getRDFDataResult(String datakey) {
 		return SingletonStore.storeInstance.getRDFDataResult(datakey);
+	}
+	
+	//TODO not removable
+	public void loadExample() {
+		Model raw_data = ModelFactory.createDefaultModel();
+		Model res_data = ModelFactory.createDefaultModel();
+		
+		raw_data.read("./RDF_EXAMPLES/film_runtime_100/dataset.nt","N-TRIPLES");
+		res_data.read("./RDF_EXAMPLES/film_runtime_100/result.nt","N-TRIPLES");
+		
+		SingletonStore.storeInstance.addRDFData(raw_data, "example");
+		SingletonStore.storeInstance.addRDFDataResult("example", res_data);
+				
 	}
 }

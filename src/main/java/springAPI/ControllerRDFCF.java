@@ -1,4 +1,4 @@
-package v122;
+package springAPI;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,6 +22,11 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponses;
+import rdfcf.RDFAnalyze;
+import rdfcf.RDFFilter;
+import rdfcf.RDFGetter;
+import rdfcf.Scheduler;
+import rdfcf.SingletonStore;
 
 
 /**
@@ -31,15 +37,17 @@ import io.swagger.annotations.ApiResponses;
  * only encoded queries supported (because of <...> parts)   
  */
 @RestController
-@Api(value="rdfcf-v1", description="RDF consistency filter - RestController")
-@RequestMapping(value = "/rdfcf/v1")
-public class Controller {
+@Api(value="rdfcf", description="RDF consistency filter - RestController")
+@RequestMapping(value = "/rdfcf")
+public class ControllerRDFCF {
 	
 //	private final String defaultSelQuery = "prefix dbo: <http://dbpedia.org/ontology/>"+
 //										   "prefix dbp: <http://dbpedia.org/property/>"+
 //										   "select * where { ?film a dbo:Film. ?film dbp:runtime ?runtime.} Limit 100"; 
 	
 	private static final Logger log = LoggerFactory.getLogger(Scheduler.class);
+	
+	static final String VERSION = "v1";
 	
 	private final String defaultConQuery = "empty";
     
@@ -58,7 +66,7 @@ public class Controller {
     	@ApiImplicitParam(name = "limit", value = "Endpoint return limit", required = true, dataType = "string", paramType = "query", defaultValue="10000"),
     	@ApiImplicitParam(name = "query", value = "Construct Query", required = true, dataType = "string", paramType = "query", defaultValue=defaultConQuery)
     })
-    @RequestMapping(value="/query", method=RequestMethod.POST)
+    @RequestMapping(value="/query", method=RequestMethod.POST, produces={"application/v1+json"})
     public @ResponseBody String queryRDF(@RequestParam(value="endpoint",required=true, defaultValue="")String endpoint,
     										 @RequestParam(value="limit",required=true, defaultValue="")long limit,
     										 @RequestParam(value="query",required=true, defaultValue="")String query) {
@@ -106,14 +114,19 @@ public class Controller {
 //            @ApiResponse(code = 404, message = "Not Found"),
 //            @ApiResponse(code = 500, message = "Failure")
             }) 
-    @RequestMapping(value="/show/{datakey}", method=RequestMethod.GET, produces={"text/text;charset=UTF-8"})
+    @RequestMapping(value="/show/{datakey}", method=RequestMethod.GET, produces={"application/v1+json"})
     public @ResponseBody String showRDF(@PathVariable String datakey,
     									@RequestParam(value="format", defaultValue="TURTLE") String format) {
     	
     	SingletonStore store = SingletonStore.getInstance();
     	
-    	Model model = store.getRDFDataResult(datakey);
+    	Model model = ModelFactory.createDefaultModel(); 
+    			
+    	model = store.getRDFDataResult(datakey);
     	
+    	if(model == null) {
+    		log.info("model ist ####");
+    	}
     	
     	switch (format) {
     		case "TURTLE":  
@@ -147,7 +160,7 @@ public class Controller {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "datakey", value = "Key", required = true, dataType = "string", paramType = "path", defaultValue="film_runtime_100"),
       })
-    @RequestMapping(value="/analyze/{datakey}", method=RequestMethod.GET, produces={"application/json"})
+    @RequestMapping(value="/analyze/{datakey}", method=RequestMethod.GET, produces={"application/v1+json"})
 	public @ResponseBody String analyzeRDF(@PathVariable(value="datakey")String datakey) {
     	
     	String response = "{ ";
@@ -200,13 +213,13 @@ public class Controller {
     @ApiOperation(value = "filter", nickname = "filterRDF")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "datakey", value ="Key", required = true, dataType = "string", paramType = "path", defaultValue="example"),
-        @ApiImplicitParam(name = "filter",  value ="p+d1,d2", required = true, dataType = "string", paramType = "query", defaultValue="http://dbpedia.org/property/runtime;http://www.w3.org/2001/XMLSchema#integer"),
+        @ApiImplicitParam(name = "filter",  value ="p;d1;d2", required = true, dataType = "string[]", paramType = "query", defaultValue="http://dbpedia.org/property/runtime;http://www.w3.org/2001/XMLSchema#integer"),
         @ApiImplicitParam(name = "remove_duplicates",value ="", required = false, dataType = "boolean", paramType = "query", defaultValue="true"),
         @ApiImplicitParam(name = "consistent", value ="", required = false, dataType = "boolean", paramType = "query", defaultValue="true"),
         @ApiImplicitParam(name = "rdfunit_params", value ="", required = false, dataType = "string", paramType = "query", defaultValue="skip")
         
     })
-    @RequestMapping(value="/filter/{datakey}", method=RequestMethod.POST , produces={"application/json"})
+    @RequestMapping(value="/filter/{datakey}", method=RequestMethod.POST, produces={"application/v1+json"})
     public @ResponseBody String filterRDF(@PathVariable String datakey, 
     										  @RequestParam( value = "filter[]", defaultValue="http://dbpedia.org/property/runtime;http://www.w3.org/2001/XMLSchema#integer")String[] filter,    	
     										  @RequestParam( value = "remove_duplicates", defaultValue="true")boolean remove_duplicates,
@@ -270,7 +283,7 @@ public class Controller {
     @ApiImplicitParams({
     	@ApiImplicitParam(name = "datakey", value = "Key", required = true, dataType = "string", paramType = "path", defaultValue=""),
     })
-    @RequestMapping(value="/delete/{datakey}", method=RequestMethod.DELETE )
+    @RequestMapping(value="/delete/{datakey}", method=RequestMethod.DELETE, produces={"application/v1+json"})
     public String deleteDataset(@PathVariable(value="datakey") String datakey) {
     	
     	SingletonStore store = SingletonStore.getInstance();
@@ -287,20 +300,4 @@ public class Controller {
     	
     }
     
-    /**
-     * Multiple Value Test
-     */
-    @RequestMapping(value="/test" , method=RequestMethod.GET)
-    public String method(@RequestParam(value="filter") String[] filter){
-           	
-    	ArrayList<String> p = new ArrayList<String>();
-    	ArrayList<String> o = new ArrayList<String>();
-    	
-    	for(String f : filter) {
-    		p.add(f.split(":")[0]);
-    		o.add(f.split(":")[1]);
-    	}
-    	
-    	return p.toString()+"<br>"+o.toString();
-    }
 }

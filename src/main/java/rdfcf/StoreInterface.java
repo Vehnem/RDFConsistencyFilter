@@ -1,4 +1,4 @@
-package v122;
+package rdfcf;
 
 import org.apache.jena.rdf.model.Model;
 
@@ -17,6 +17,8 @@ public interface StoreInterface {
 	 * @return
 	 */
 	public String addRDFData(Model model);
+	
+	public void addRDFData(Model model, String datakey);
 	
 	/**
 	 * Get RDFData from store

@@ -1,4 +1,4 @@
-package v122;
+package rdfcf;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -55,6 +55,14 @@ public final class SingletonFileStore implements StoreInterface {
 		}
 		return dataKey;
 	}
+	
+	//TODO
+	@Override
+	public void addRDFData(Model model, String datakey) {
+		// TODO Auto-generated method stub
+		
+	}
+	
 	@Override
 	public Model getRDFData(String datakey) {
 		

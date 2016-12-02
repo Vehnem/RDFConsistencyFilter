@@ -1,4 +1,4 @@
-package v122;
+package rdfcf;
 
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;

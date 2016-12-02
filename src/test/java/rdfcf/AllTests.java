@@ -1,4 +1,4 @@
-package v122;
+package rdfcf;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

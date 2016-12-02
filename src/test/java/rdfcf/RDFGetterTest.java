@@ -1,17 +1,10 @@
-package v122;
+package rdfcf;
 
-import java.io.File;
 
-import org.apache.http.util.Asserts;
 import org.apache.jena.rdf.model.Model;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-import junit.framework.Assert;
-import v122.RDFGetter;
+import rdfcf.RDFGetter;
 
 public class RDFGetterTest {
 

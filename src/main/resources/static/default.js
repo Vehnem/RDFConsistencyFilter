@@ -8,7 +8,7 @@ var RunQuery = function() {
 	var query = document.getElementById("queryfield").value;
 	$.ajax({
 		type : 'POST',
-		url : prefix + '/rdfcf/v1/query',
+		url : prefix + '/rdfcf/query',
 		data : {
 			"query" : query,
 			"limit" : limit,
@@ -38,7 +38,7 @@ var RunQuery = function() {
 var AnalyzeRDF = function(property) {
 	$.ajax({
 		type : 'GET',
-		url : prefix + '/rdfcf/v1/analyze/' + datakey,
+		url : prefix + '/rdfcf/analyze/' + datakey,
 		dataType : 'json',
 		async : true,
 		success : function(result) {
@@ -129,7 +129,7 @@ var RunFilter = function() {
 	//document.getElementById("test").innerHTML = "---"+remove_duplicates+"---"+consistent+"---"+rdfunit_params;
 	$.ajax({
 		type : "POST",
-		url : prefix + "/rdfcf/v1/filter/" + datakey,
+		url : prefix + "/rdfcf/filter/" + datakey,
 		data : {
 			filter,
 			remove_duplicates,
@@ -155,14 +155,14 @@ var RunFilter = function() {
 var DownloadRDF = function() {
 	var formatlist = document.getElementById("menue_format");
 	var format = formatlist.options[formatlist.selectedIndex].value;
-	window.open(prefix + "/rdfcf/v1/show/" + datakey + "?format=" + format,
+	window.open(prefix + "/rdfcf/show/" + datakey + "?format=" + format,
 			"_blank");
 }
 
 var DeleteRDF = function() {
 	$.ajax({
 		type : "DELETE",
-		url : prefix + "rdfcf/v1/delete/" + datakey,
+		url : prefix + "rdfcf/delete/" + datakey,
 		async : true,
 		success : function(result) {
 			if (result.message == "failed") {

@@ -1,4 +1,4 @@
-package v122;
+package rdfcf;
 
 
 import static org.junit.Assert.*;
@@ -27,7 +27,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import v122.RDFFilter;
+import rdfcf.RDFFilter;
 
 
 /**

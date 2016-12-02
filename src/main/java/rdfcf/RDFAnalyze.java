@@ -1,4 +1,4 @@
-package v122;
+package rdfcf;
 import java.util.ArrayList;
 
 import org.apache.jena.rdf.model.Model;

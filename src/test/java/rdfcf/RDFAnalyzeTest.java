@@ -1,4 +1,4 @@
-package v122;
+package rdfcf;
 
 import static org.junit.Assert.*;
 
@@ -12,7 +12,7 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
-import v122.RDFAnalyze;
+import rdfcf.RDFAnalyze;
 
 public class RDFAnalyzeTest {
 

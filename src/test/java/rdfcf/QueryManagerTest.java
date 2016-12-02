@@ -1,4 +1,4 @@
-package v122;
+package rdfcf;
 
 import static org.junit.Assert.*;
 
@@ -7,7 +7,7 @@ import org.apache.jena.query.QueryFactory;
 import org.junit.Test;
 
 import junit.framework.Assert;
-import v122.QueryManager;
+import rdfcf.QueryManager;
 
 /**
  * Creates a CONSTRUCT QUERY from a SELECT QUERY

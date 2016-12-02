@@ -1,4 +1,4 @@
-package v122;
+package rdfcf;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -69,6 +69,15 @@ public class SingletonMemoryStore implements StoreInterface {
 		return datakey;
 	}
 
+	@Override
+	public void addRDFData(Model model, String datakey) {
+		//addModel
+		models.put(datakey, model);
+				
+		//addModelTime
+		modelTimes.put(datakey, System.currentTimeMillis()*2);
+	}
+	
 	@Override
 	public Model getRDFData(String datakey) {
 		
